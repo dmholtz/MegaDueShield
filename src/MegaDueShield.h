@@ -3,13 +3,14 @@
 *
 * (C) 2018 by David Holtz
 * Version 1.1 (March 2018)
+* version 1.2 (April 2020)
 *
 */
 
 // I/O definition
 
-#ifndef MegaDueShield_h
-#define MegaDueShield_h
+#ifndef _MegaDueShield_H_
+#define _MegaDueShield_H_
 
 #define I1 A2
 #define I2 A5
@@ -29,8 +30,8 @@
 #define C2 2
 #define C3 18
 #define C4 19
-#define SDA 20
-#define SCL 21
+#define SDA_PIN 20
+#define SCL_PIN 21
 
 #define RGB_RED 14
 #define RGB_GREEN 13
@@ -50,45 +51,43 @@
 
 #include "Arduino.h"
 #include "StepperMotor.h"
-#include "DCMotor.h"
+#include "DC_Motor.h"
+#include "L293D.h"
 #include "DCOutput.h"
 
 class MegaDueShield
 {
+private:
+	// {chipEnable, input1, input2}
+	const uint8_t dcMotorPins[8][3] = {
+		{9, A0, A1},
+		{8, A3, 40},
+		{7, A9, A8},
+		{10, 31, 33},
+		{11, 27, 22},
+		{6, 46, 44},
+		{5, 32, 34},
+		{4, 28, 26}};
+
+	// {stepPin, directionPin, msPin, stbyPin}
+	const uint8_t stepperPins[2][4] = {
+		{a10P_10, a10P_8, a10P_7, a10P_9},
+		{a10P_3, a10P_1, a10P_5, a10P_9}};
+
+	DC_Motor *dcMotors[8]{nullptr};
+	DCOutput *dcOutputs[16]{nullptr};
+	StepperMotor steppers[2];
+
 public:
 	MegaDueShield();
-	
+	~MegaDueShield();
+
 	void rgb(uint8_t r, uint8_t g, uint8_t b);
 	void rgbOff();
 
-	DCMotor *getDCMotor(uint8_t motorID);
+	DC_Motor *getDCMotor(uint8_t motor_id);
 	DCOutput *getDCOutput(uint8_t outputID);
 	StepperMotor *getStepper(uint8_t stepperID);
-
-
-private:
-	void init();
-	// {chipEnable, input1, input2}
-	const uint8_t dcMotorPins[8][3] = {
-	{ 9,A0,A1},
-	{ 8,A3,40 },
-	{ 7,A9,A8 },
-	{ 10,31,33 },
-	{ 11,27,22 },
-	{ 6,46,44 },
-	{ 5,32,34 },
-	{ 4,28,26 }};
-	// {stepPin, directionPin, msPin, stbyPin}
-	const uint8_t stepperPins[2][4] = {
-	{ a10P_10,a10P_8,a10P_7,a10P_9 },
-	{ a10P_3, a10P_1,a10P_5,a10P_9 } };
-
-	DCMotor dcMotors[8];
-	DCOutput dcOutputs[16];
-	StepperMotor steppers[2];
 };
 
-extern MegaDueShield shield;
-
 #endif
-
